@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💍 王静雯 & 李栋 · 备婚进度工作台</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+  :root {
+    --rose: #e8a0b4;
+    --rose-light: #fce4ec;
+    --rose-dark: #c2185b;
+    --gold: #d4a853;
+    --gold-light: #fdf3dc;
+    --cream: #fff9f5;
+    --sage: #a8b5a0;
+    --sage-light: #e8ede6;
+    --text: #3a3a3a;
+    --text-light: #7a7a7a;
+    --white: #ffffff;
+    --shadow: 0 4px 24px rgba(0,0,0,0.06);
+    --shadow-hover: 0 8px 32px rgba(0,0,0,0.10);
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    text-align: center;
+    padding: 60px 20px 40px;
+    background: linear-gradient(135deg, #fce4ec 0%, #fff9f5 40%, #fdf3dc 100%);
+    overflow: hidden;
+  }
+  .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(212,168,83,0.12) 0%, transparent 70%); border-radius: 50%; }
+  .hero::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(232,160,180,0.15) 0%, transparent 70%); border-radius: 50%; }
+  .hero-emoji { font-size: 48px; margin-bottom: 8px; }
+  .hero h1 { font-family: 'Noto Serif SC', serif; font-size: 2.4rem; font-weight: 700; background: linear-gradient(135deg, var(--rose-dark), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
+  .hero .names { font-family: 'Noto Serif SC', serif; font-size: 1.5rem; color: var(--text); letter-spacing: 6px; margin-bottom: 6px; }
+  .hero .names .heart { color: var(--rose-dark); margin: 0 8px; }
+  .hero .date-info { font-size: 1rem; color: var(--text-light); margin-bottom: 30px; }
+
+  .countdown { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+  .countdown-item { background: var(--white); border-radius: 16px; padding: 18px 24px; min-width: 100px; box-shadow: var(--shadow); border: 1px solid rgba(232,160,180,0.2); }
+  .countdown-item .num { font-family: 'Noto Serif SC', serif; font-size: 2.4rem; font-weight: 700; color: var(--rose-dark); line-height: 1; }
+  .countdown-item .label { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
+
+  /* Progress */
+  .progress-section { max-width: 900px; margin: -30px auto 0; padding: 0 20px; position: relative; z-index: 2; }
+  .progress-card { background: var(--white); border-radius: var(--radius); padding: 28px 32px; box-shadow: var(--shadow); border: 1px solid rgba(232,160,180,0.15); }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .progress-header h2 { font-family: 'Noto Serif SC', serif; font-size: 1.2rem; color: var(--text); }
+  .progress-header .pct { font-size: 1.6rem; font-weight: 700; color: var(--rose-dark); }
+  .progress-bar-bg { height: 12px; background: var(--rose-light); border-radius: 6px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--rose), var(--rose-dark)); border-radius: 6px; transition: width 0.8s ease; }
+  .progress-stats { display: flex; gap: 32px; margin-top: 16px; flex-wrap: wrap; }
+  .progress-stats .stat { font-size: 0.9rem; color: var(--text-light); }
+  .progress-stats .stat strong { color: var(--text); font-weight: 600; }
+
+  /* Filters */
+  .filters { max-width: 900px; margin: 28px auto 0; padding: 0 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .filter-btn { padding: 8px 18px; border-radius: 24px; border: 1.5px solid #ddd; background: var(--white); font-size: 0.9rem; color: var(--text-light); cursor: pointer; transition: all 0.2s; font-family: 'Noto Sans SC', sans-serif; }
+  .filter-btn:hover { border-color: var(--rose); color: var(--rose-dark); }
+  .filter-btn.active { background: linear-gradient(135deg, var(--rose), var(--rose-dark)); color: #fff; border-color: transparent; }
+  .filter-btn .count-badge { display: inline-block; background: rgba(255,255,255,0.3); border-radius: 10px; padding: 1px 7px; font-size: 0.75rem; margin-left: 4px; }
+  .filter-btn:not(.active) .count-badge { background: #f0f0f0; }
+
+  /* Main */
+  .main { max-width: 900px; margin: 24px auto 100px; padding: 0 20px; }
+
+  .category { margin-bottom: 28px; }
+  .category-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; cursor: pointer; user-select: none; }
+  .category-icon { font-size: 1.4rem; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; flex-shrink: 0; }
+  .category-header h3 { font-family: 'Noto Serif SC', serif; font-size: 1.15rem; font-weight: 600; flex: 1; }
+  .category-progress { font-size: 0.85rem; color: var(--text-light); padding: 4px 12px; background: var(--sage-light); border-radius: 12px; }
+  .category-chevron { font-size: 0.8rem; color: var(--text-light); transition: transform 0.3s; }
+  .category.collapsed .category-chevron { transform: rotate(-90deg); }
+  .category.collapsed .task-list { display: none; }
+
+  .task-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .task-item { background: var(--white); border-radius: 12px; padding: 14px 18px; display: flex; align-items: flex-start; gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.04); transition: all 0.2s; }
+  .task-item:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+  .task-item.done { opacity: 0.55; background: #f9f9f9; }
+  .task-item.done .task-name { text-decoration: line-through; color: var(--text-light); }
+
+  .task-checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #ccc; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 13px; color: transparent; cursor: pointer; }
+  .task-item.done .task-checkbox { background: linear-gradient(135deg, var(--sage), #7a9a6f); border-color: transparent; color: #fff; }
+
+  .task-content { flex: 1; min-width: 0; }
+  .task-name { font-size: 0.95rem; font-weight: 500; line-height: 1.5; transition: all 0.2s; }
+  .task-meta { display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap; align-items: center; }
+  .task-deadline { font-size: 0.8rem; color: var(--text-light); display: flex; align-items: center; gap: 3px; }
+  .task-deadline.urgent { color: #d32f2f; font-weight: 500; }
+  .task-deadline.soon { color: #e67e22; }
+  .task-tag { font-size: 0.75rem; padding: 2px 8px; border-radius: 8px; font-weight: 500; }
+  .tag-bride { background: var(--rose-light); color: var(--rose-dark); }
+  .tag-groom { background: #e3f2fd; color: #1565c0; }
+  .tag-both { background: var(--gold-light); color: #b8860b; }
+  .tag-vendor { background: #f3e5f5; color: #7b1fa2; }
+  .task-priority { font-size: 0.75rem; padding: 2px 8px; border-radius: 8px; font-weight: 600; }
+  .priority-high { background: #ffebee; color: #c62828; }
+  .priority-mid { background: #fff8e1; color: #f57f17; }
+  .priority-low { background: #e8f5e9; color: #2e7d32; }
+
+  .task-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: flex-start; margin-top: 2px; }
+  .task-actions button { width: 30px; height: 30px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: #f5f5f5; color: #999; }
+  .task-actions button:hover { background: #eee; color: #666; }
+  .task-actions .btn-delete:hover { background: #ffebee; color: #c62828; }
+  .task-actions .btn-edit:hover { background: #e3f2fd; color: #1565c0; }
+
+  /* Add Button (FAB) */
+  .fab { position: fixed; bottom: 30px; right: 30px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--rose), var(--rose-dark)); color: #fff; border: none; font-size: 28px; cursor: pointer; box-shadow: 0 4px 16px rgba(194,24,91,0.35); z-index: 100; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+  .fab:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(194,24,91,0.45); }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--white); border-radius: 20px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalIn 0.25s ease-out; }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(20px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .modal-header { padding: 24px 28px 0; display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h2 { font-family: 'Noto Serif SC', serif; font-size: 1.2rem; }
+  .modal-close { width: 32px; height: 32px; border-radius: 50%; border: none; background: #f0f0f0; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; color: #999; transition: all 0.2s; }
+  .modal-close:hover { background: #e0e0e0; color: #666; }
+  .modal-body { padding: 20px 28px 28px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-light); margin-bottom: 6px; }
+  .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 0.95rem; font-family: 'Noto Sans SC', sans-serif; outline: none; transition: border-color 0.2s; background: #fff; }
+  .form-group input:focus, .form-group select:focus { border-color: var(--rose); }
+  .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23999'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  .form-row { display: flex; gap: 12px; }
+  .form-row .form-group { flex: 1; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+  .modal-actions button { padding: 10px 24px; border-radius: 10px; border: none; font-size: 0.95rem; cursor: pointer; font-family: 'Noto Sans SC', sans-serif; font-weight: 500; transition: all 0.2s; }
+  .btn-cancel { background: #f0f0f0; color: #666; }
+  .btn-cancel:hover { background: #e0e0e0; }
+  .btn-save { background: linear-gradient(135deg, var(--rose), var(--rose-dark)); color: #fff; }
+  .btn-save:hover { box-shadow: 0 4px 12px rgba(194,24,91,0.3); }
+
+  /* Confirm Dialog */
+  .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
+  .confirm-overlay.show { display: flex; }
+  .confirm-box { background: var(--white); border-radius: 16px; padding: 28px; max-width: 360px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalIn 0.2s ease-out; }
+  .confirm-box p { font-size: 1rem; margin-bottom: 20px; line-height: 1.6; }
+  .confirm-box .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+  .confirm-box .confirm-actions button { padding: 10px 28px; border-radius: 10px; border: none; font-size: 0.95rem; cursor: pointer; font-family: 'Noto Sans SC', sans-serif; font-weight: 500; }
+  .btn-no { background: #f0f0f0; color: #666; }
+  .btn-yes { background: #c62828; color: #fff; }
+
+  /* Notes */
+  .notes-section { max-width: 900px; margin: 0 auto 40px; padding: 0 20px; }
+  .notes-card { background: var(--white); border-radius: var(--radius); padding: 24px 28px; box-shadow: var(--shadow); border: 1px solid rgba(212,168,83,0.2); }
+  .notes-card h2 { font-family: 'Noto Serif SC', serif; font-size: 1.1rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .notes-card textarea { width: 100%; min-height: 100px; border: 1px solid #e0e0e0; border-radius: 10px; padding: 12px; font-family: 'Noto Sans SC', sans-serif; font-size: 0.9rem; resize: vertical; outline: none; transition: border-color 0.2s; line-height: 1.6; }
+  .notes-card textarea:focus { border-color: var(--rose); }
+
+  /* Footer */
+  .footer { text-align: center; padding: 30px 20px 40px; color: var(--text-light); font-size: 0.85rem; }
+  .footer .hearts { font-size: 1.4rem; margin-bottom: 6px; }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.8rem; }
+    .hero .names { font-size: 1.2rem; letter-spacing: 3px; }
+    .countdown-item { min-width: 70px; padding: 12px 16px; }
+    .countdown-item .num { font-size: 1.8rem; }
+    .countdown { gap: 10px; }
+    .progress-card { padding: 20px; }
+    .task-item { padding: 12px 14px; }
+    .fab { bottom: 20px; right: 20px; width: 50px; height: 50px; font-size: 24px; }
+    .modal { border-radius: 16px; }
+    .form-row { flex-direction: column; gap: 0; }
+  }
+
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .category { animation: fadeInUp 0.5s ease-out both; }
+  .category:nth-child(1) { animation-delay: 0.05s; }
+  .category:nth-child(2) { animation-delay: 0.1s; }
+  .category:nth-child(3) { animation-delay: 0.15s; }
+  .category:nth-child(4) { animation-delay: 0.2s; }
+  .category:nth-child(5) { animation-delay: 0.25s; }
+  .category:nth-child(6) { animation-delay: 0.3s; }
+  .category:nth-child(7) { animation-delay: 0.35s; }
+  .category:nth-child(8) { animation-delay: 0.4s; }
+  .category:nth-child(9) { animation-delay: 0.45s; }
+
+  @media print {
+    .hero { padding: 20px; }
+    .task-item { break-inside: avoid; }
+    .filters, .notes-section, .fab { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-emoji">💒</div>
+  <h1>备婚进度工作台</h1>
+  <div class="names">王静雯 <span class="heart">♥</span> 李栋</div>
+  <div class="date-info">📅 2026年9月12日 · 周六 · 距离婚礼还有 <strong id="daysLeft">—</strong> 天</div>
+  <div class="countdown">
+    <div class="countdown-item"><div class="num" id="cdDays">—</div><div class="label">天</div></div>
+    <div class="countdown-item"><div class="num" id="cdHours">—</div><div class="label">时</div></div>
+    <div class="countdown-item"><div class="num" id="cdMins">—</div><div class="label">分</div></div>
+    <div class="countdown-item"><div class="num" id="cdSecs">—</div><div class="label">秒</div></div>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="progress-section">
+  <div class="progress-card">
+    <div class="progress-header">
+      <h2>📊 总体进度</h2>
+      <div class="pct" id="totalPct">0%</div>
+    </div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="totalBar" style="width:0%"></div></div>
+    <div class="progress-stats">
+      <div class="stat">✅ 已完成 <strong id="doneCount">0</strong></div>
+      <div class="stat">📋 待完成 <strong id="todoCount">0</strong></div>
+      <div class="stat">📌 总计 <strong id="totalCount">0</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="filters" id="filters"></div>
+
+<!-- Task List -->
+<div class="main" id="taskContainer"></div>
+
+<!-- FAB: Add Task -->
+<button class="fab" onclick="openAddModal()" title="添加事项">＋</button>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">添加新事项</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>事项名称 *</label>
+        <input type="text" id="fName" placeholder="例：选定婚礼策划师" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>分类</label>
+          <select id="fCat">
+            <option value="venue">🏨 婚宴场地</option>
+            <option value="photo">📸 婚纱照</option>
+            <option value="ceremony">💒 仪式策划</option>
+            <option value="clothing">👗 服饰造型</option>
+            <option value="invite">💌 请柬宾客</option>
+            <option value="gift">🎁 礼品喜糖</option>
+            <option value="legal">📋 证件手续</option>
+            <option value="honeymoon">✈️ 蜜月旅行</option>
+            <option value="other">✨ 其他杂项</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>负责人</label>
+          <select id="fWho">
+            <option value="both">👫 两人</option>
+            <option value="bride">👰 新娘</option>
+            <option value="groom">🤵 新郎</option>
+            <option value="vendor">🤝 婚庆</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>优先级</label>
+          <select id="fPri">
+            <option value="high">🔴 紧急</option>
+            <option value="mid" selected>🟡 重要</option>
+            <option value="low">🟢 一般</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>截止时间</label>
+          <input type="date" id="fDeadline" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">取消</button>
+        <button class="btn-save" onclick="saveTask()">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <p>确定要删除这个事项吗？<br><small style="color:#999">删除后无法恢复</small></p>
+    <div class="confirm-actions">
+      <button class="btn-no" onclick="closeConfirm()">取消</button>
+      <button class="btn-yes" id="btnConfirmYes">删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notes -->
+<div class="notes-section">
+  <div class="notes-card">
+    <h2>📝 备忘录</h2>
+    <textarea id="notes" placeholder="在这里记录临时想法、备忘事项……&#10;数据保存在浏览器本地，刷新不会丢失。"></textarea>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="hearts">💕</div>
+  王静雯 & 李栋 · 备婚倒计时 · 2026.09.12
+</div>
+
+<script>
+const WEDDING_DATE = new Date('2026-09-12T10:00:00+08:00');
+const STORAGE_KEY = 'wedding_tasks_v2';
+const NOTES_KEY = 'wedding_notes_v2';
+
+const CATEGORIES = [
+  { id: 'venue', icon: '🏨', name: '婚宴场地 & 酒店', color: '#fce4ec' },
+  { id: 'photo', icon: '📸', name: '婚纱照 & 影像', color: '#e8ede6' },
+  { id: 'ceremony', icon: '💒', name: '仪式 & 婚礼策划', color: '#fff3e0' },
+  { id: 'clothing', icon: '👗', name: '服饰 & 造型', color: '#f3e5f5' },
+  { id: 'invite', icon: '💌', name: '请柬 & 宾客', color: '#e3f2fd' },
+  { id: 'gift', icon: '🎁', name: '礼品 & 喜糖', color: '#fdf3dc' },
+  { id: 'legal', icon: '📋', name: '证件 & 手续', color: '#e0f2f1' },
+  { id: 'honeymoon', icon: '✈️', name: '蜜月 & 旅行', color: '#fce4ec' },
+  { id: 'other', icon: '✨', name: '其他 & 杂项', color: '#f5f5f5' },
+];
+
+const DEFAULT_TASKS = [
+  { id:'t01', name:'确定婚礼日期', cat:'venue', who:'both', pri:'high', deadline:'2026-05', done:true },
+  { id:'t02', name:'选定婚宴酒店/场地', cat:'venue', who:'both', pri:'high', deadline:'2026-06', done:true },
+  { id:'t03', name:'确定酒席桌数 & 菜单', cat:'venue', who:'both', pri:'high', deadline:'2026-07', done:false },
+  { id:'t04', name:'确认场地布置方案', cat:'venue', who:'both', pri:'mid', deadline:'2026-08', done:false },
+  { id:'t05', name:'确认婚礼当天场地时间线', cat:'venue', who:'vendor', pri:'mid', deadline:'2026-08-20', done:false },
+  { id:'t06', name:'选定婚纱摄影机构', cat:'photo', who:'both', pri:'high', deadline:'2026-06', done:true },
+  { id:'t07', name:'拍摄婚纱照', cat:'photo', who:'both', pri:'high', deadline:'2026-07', done:false },
+  { id:'t08', name:'选片 & 精修', cat:'photo', who:'bride', pri:'mid', deadline:'2026-08', done:false },
+  { id:'t09', name:'确定婚礼当天跟拍/跟摄团队', cat:'photo', who:'both', pri:'high', deadline:'2026-07', done:false },
+  { id:'t10', name:'制作婚礼当天播放视频/相册', cat:'photo', who:'both', pri:'low', deadline:'2026-09-01', done:false },
+  { id:'t11', name:'选定婚礼策划/司仪', cat:'ceremony', who:'both', pri:'high', deadline:'2026-07', done:false },
+  { id:'t12', name:'确定婚礼主题 & 风格', cat:'ceremony', who:'both', pri:'high', deadline:'2026-07', done:false },
+  { id:'t13', name:'确定婚礼流程 & 环节', cat:'ceremony', who:'both', pri:'mid', deadline:'2026-08', done:false },
+  { id:'t14', name:'选定花艺/现场装饰方案', cat:'ceremony', who:'bride', pri:'mid', deadline:'2026-08', done:false },
+  { id:'t15', name:'确定音响/灯光设备', cat:'ceremony', who:'vendor', pri:'mid', deadline:'2026-08-15', done:false },
+  { id:'t16', name:'准备婚礼誓词', cat:'ceremony', who:'both', pri:'low', deadline:'2026-09-05', done:false },
+  { id:'t17', name:'新娘选婚纱/礼服', cat:'clothing', who:'bride', pri:'high', deadline:'2026-07', done:false },
+  { id:'t18', name:'新郎选西装/礼服', cat:'clothing', who:'groom', pri:'high', deadline:'2026-07', done:false },
+  { id:'t19', name:'新娘选配饰（头饰、首饰、婚鞋）', cat:'clothing', who:'bride', pri:'mid', deadline:'2026-08', done:false },
+  { id:'t20', name:'新郎选皮鞋、领带/领结', cat:'clothing', who:'groom', pri:'mid', deadline:'2026-08', done:false },
+  { id:'t21', name:'选定化妆造型师 & 试妆', cat:'clothing', who:'bride', pri:'high', deadline:'2026-08', done:false },
+  { id:'t22', name:'伴郎伴娘服装确认', cat:'clothing', who:'both', pri:'mid', deadline:'2026-08-15', done:false },
+  { id:'t23', name:'拟定宾客名单', cat:'invite', who:'both', pri:'high', deadline:'2026-07', done:false },
+  { id:'t24', name:'设计 & 制作请柬', cat:'invite', who:'both', pri:'high', deadline:'2026-08', done:false },
+  { id:'t25', name:'发送请柬 & 确认出席', cat:'invite', who:'both', pri:'high', deadline:'2026-08-15', done:false },
+  { id:'t26', name:'制作座位安排表', cat:'invite', who:'both', pri:'mid', deadline:'2026-09-01', done:false },
+  { id:'t27', name:'确定签到 & 迎宾方案', cat:'invite', who:'both', pri:'low', deadline:'2026-09-05', done:false },
+  { id:'t28', name:'选购喜糖 & 喜糖盒', cat:'gift', who:'both', pri:'mid', deadline:'2026-08', done:false },
+  { id:'t29', name:'准备伴手礼/回礼', cat:'gift', who:'both', pri:'mid', deadline:'2026-08-20', done:false },
+  { id:'t30', name:'选购婚戒/对戒', cat:'gift', who:'both', pri:'high', deadline:'2026-07', done:false },
+  { id:'t31', name:'准备红包（改口费、开门红包等）', cat:'gift', who:'both', pri:'mid', deadline:'2026-09-01', done:false },
+  { id:'t32', name:'准备婚礼游戏道具 & 奖品', cat:'gift', who:'both', pri:'low', deadline:'2026-09-05', done:false },
+  { id:'t33', name:'领结婚证', cat:'legal', who:'both', pri:'high', deadline:'2026-09', done:false },
+  { id:'t34', name:'准备户口本、身份证等证件', cat:'legal', who:'both', pri:'high', deadline:'2026-08-25', done:false },
+  { id:'t35', name:'婚前体检', cat:'legal', who:'both', pri:'mid', deadline:'2026-08', done:false },
+  { id:'t36', name:'确定蜜月目的地', cat:'honeymoon', who:'both', pri:'mid', deadline:'2026-07', done:false },
+  { id:'t37', name:'预订机票 & 酒店', cat:'honeymoon', who:'both', pri:'mid', deadline:'2026-08', done:false },
+  { id:'t38', name:'办理签证（如需）', cat:'honeymoon', who:'both', pri:'mid', deadline:'2026-08', done:false },
+  { id:'t39', name:'准备旅行用品', cat:'honeymoon', who:'both', pri:'low', deadline:'2026-09-08', done:false },
+  { id:'t40', name:'确定伴郎伴娘团', cat:'other', who:'both', pri:'high', deadline:'2026-07', done:false },
+  { id:'t41', name:'婚车安排', cat:'other', who:'groom', pri:'mid', deadline:'2026-08-20', done:false },
+  { id:'t42', name:'准备接亲游戏方案', cat:'other', who:'bride', pri:'low', deadline:'2026-09-05', done:false },
+  { id:'t43', name:'婚礼彩排', cat:'other', who:'both', pri:'high', deadline:'2026-09-10', done:false },
+  { id:'t44', name:'新房布置', cat:'other', who:'both', pri:'mid', deadline:'2026-09-08', done:false },
+  { id:'t45', name:'确认婚礼当天应急包', cat:'other', who:'bride', pri:'low', deadline:'2026-09-10', done:false },
+];
+
+let currentFilter = 'all';
+let editingId = null;
+
+// Load tasks: merge saved with defaults (keep done state, add new defaults)
+function loadTasks() {
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+  if (saved && Array.isArray(saved)) {
+    // Merge: if user has custom tasks, keep them; also ensure any new defaults are added
+    const savedIds = new Set(saved.map(t => t.id));
+    const merged = [...saved];
+    DEFAULT_TASKS.forEach(dt => {
+      if (!savedIds.has(dt.id)) merged.push({ ...dt });
+    });
+    return merged;
+  }
+  return DEFAULT_TASKS.map(t => ({ ...t }));
+}
+
+let TASKS = loadTasks();
+
+function saveTasks() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(TASKS));
+}
+
+// Countdown
+function updateCountdown() {
+  const now = new Date();
+  const diff = WEDDING_DATE - now;
+  if (diff <= 0) {
+    document.getElementById('cdDays').textContent = '🎉';
+    document.getElementById('cdHours').textContent = '0';
+    document.getElementById('cdMins').textContent = '0';
+    document.getElementById('cdSecs').textContent = '0';
+    document.getElementById('daysLeft').textContent = '0';
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cdDays').textContent = d;
+  document.getElementById('cdHours').textContent = h;
+  document.getElementById('cdMins').textContent = m;
+  document.getElementById('cdSecs').textContent = s;
+  document.getElementById('daysLeft').textContent = d;
+}
+
+// Toggle done
+function toggleTask(id) {
+  const t = TASKS.find(x => x.id === id);
+  if (t) { t.done = !t.done; saveTasks(); render(); }
+}
+
+// Deadline display
+function deadlineText(dl) {
+  if (!dl) return { label: '', urgent: false, soon: false };
+  let label, urgent = false, soon = false;
+  if (dl.length === 7) {
+    label = dl.replace('-', '年') + '月前';
+    const [y, m] = dl.split('-').map(Number);
+    const endOfMonth = new Date(y, m, 0);
+    const daysLeft = (endOfMonth - new Date()) / 86400000;
+    if (daysLeft < 0) urgent = true; else if (daysLeft < 14) soon = true;
+  } else {
+    const parts = dl.split('-').map(Number);
+    const d = new Date(parts[0], parts[1]-1, parts[2]);
+    label = `${parts[0]}年${parts[1]}月${parts[2]}日`;
+    const daysLeft = (d - new Date()) / 86400000;
+    if (daysLeft < 0) urgent = true; else if (daysLeft < 14) soon = true;
+  }
+  return { label, urgent, soon };
+}
+
+function whoTag(who) {
+  const map = { bride:{text:'👰 新娘',cls:'tag-bride'}, groom:{text:'🤵 新郎',cls:'tag-groom'}, both:{text:'👫 两人',cls:'tag-both'}, vendor:{text:'🤝 婚庆',cls:'tag-vendor'} };
+  return map[who] || map.both;
+}
+
+function priTag(pri) {
+  const map = { high:{text:'紧急',cls:'priority-high'}, mid:{text:'重要',cls:'priority-mid'}, low:{text:'一般',cls:'priority-low'} };
+  return map[pri] || map.mid;
+}
+
+// Render
+function render() {
+  const done = TASKS.filter(t => t.done).length;
+  const total = TASKS.length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('totalPct').textContent = pct + '%';
+  document.getElementById('totalBar').style.width = pct + '%';
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('todoCount').textContent = total - done;
+  document.getElementById('totalCount').textContent = total;
+
+  // Filters
+  const filterEl = document.getElementById('filters');
+  let filterHTML = `<button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">全部<span class="count-badge">${total}</span></button>`;
+  CATEGORIES.forEach(cat => {
+    const cnt = TASKS.filter(t => t.cat === cat.id).length;
+    if (cnt > 0) {
+      filterHTML += `<button class="filter-btn ${currentFilter===cat.id?'active':''}" onclick="setFilter('${cat.id}')">${cat.icon} ${cat.name}<span class="count-badge">${cnt}</span></button>`;
+    }
+  });
+  filterEl.innerHTML = filterHTML;
+
+  // Tasks
+  const container = document.getElementById('taskContainer');
+  const catsToShow = currentFilter === 'all'
+    ? CATEGORIES.filter(c => TASKS.some(t => t.cat === c.id))
+    : CATEGORIES.filter(c => c.id === currentFilter);
+
+  const priOrder = { high: 0, mid: 1, low: 2 };
+  let html = '';
+  catsToShow.forEach(cat => {
+    const tasks = TASKS.filter(t => t.cat === cat.id);
+    const catDone = tasks.filter(t => t.done).length;
+    tasks.sort((a, b) => {
+      if (a.done !== b.done) return a.done ? 1 : -1;
+      return (priOrder[a.pri]||1) - (priOrder[b.pri]||1);
+    });
+    html += `<div class="category" data-cat="${cat.id}">
+      <div class="category-header" onclick="toggleCat('${cat.id}')">
+        <div class="category-icon" style="background:${cat.color}">${cat.icon}</div>
+        <h3>${cat.name}</h3>
+        <div class="category-progress">${catDone}/${tasks.length}</div>
+        <div class="category-chevron">▼</div>
+      </div><div class="task-list">`;
+    tasks.forEach(t => {
+      const dl = deadlineText(t.deadline);
+      const w = whoTag(t.who);
+      const p = priTag(t.pri);
+      html += `<div class="task-item ${t.done?'done':''}">
+        <div class="task-checkbox" onclick="toggleTask('${t.id}')">${t.done?'✓':''}</div>
+        <div class="task-content" onclick="toggleTask('${t.id}')">
+          <div class="task-name">${escHtml(t.name)}</div>
+          <div class="task-meta">
+            ${dl.label ? `<span class="task-deadline ${dl.urgent?'urgent':''} ${dl.soon?'soon':''}">📅 ${dl.label}${dl.urgent?' ⚠️':''}</span>` : ''}
+            <span class="task-tag ${w.cls}">${w.text}</span>
+            <span class="task-priority ${p.cls}">${p.text}</span>
+          </div>
+        </div>
+        <div class="task-actions">
+          <button class="btn-edit" onclick="event.stopPropagation();openEditModal('${t.id}')" title="编辑">✏️</button>
+          <button class="btn-delete" onclick="event.stopPropagation();confirmDelete('${t.id}')" title="删除">🗑️</button>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function setFilter(cat) { currentFilter = cat; render(); }
+function toggleCat(catId) { const el = document.querySelector(`.category[data-cat="${catId}"]`); if (el) el.classList.toggle('collapsed'); }
+
+// Modal: Add
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = '添加新事项';
+  document.getElementById('fName').value = '';
+  document.getElementById('fCat').value = currentFilter !== 'all' ? currentFilter : 'venue';
+  document.getElementById('fWho').value = 'both';
+  document.getElementById('fPri').value = 'mid';
+  document.getElementById('fDeadline').value = '';
+  document.getElementById('modalOverlay').classList.add('show');
+  document.getElementById('fName').focus();
+}
+
+// Modal: Edit
+function openEditModal(id) {
+  const t = TASKS.find(x => x.id === id);
+  if (!t) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = '编辑事项';
+  document.getElementById('fName').value = t.name;
+  document.getElementById('fCat').value = t.cat;
+  document.getElementById('fWho').value = t.who;
+  document.getElementById('fPri').value = t.pri;
+  // Normalize deadline to YYYY-MM-DD for date input
+  let dl = t.deadline || '';
+  if (dl.length === 7) dl += '-01';
+  document.getElementById('fDeadline').value = dl;
+  document.getElementById('modalOverlay').classList.add('show');
+  document.getElementById('fName').focus();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  editingId = null;
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+// Save task
+function saveTask() {
+  const name = document.getElementById('fName').value.trim();
+  if (!name) { document.getElementById('fName').focus(); return; }
+  const cat = document.getElementById('fCat').value;
+  const who = document.getElementById('fWho').value;
+  const pri = document.getElementById('fPri').value;
+  let deadline = document.getElementById('fDeadline').value;
+  // Store as YYYY-MM-DD or YYYY-MM
+  if (deadline && deadline.endsWith('-01')) {
+    // If day is 01, store as YYYY-MM (month-level)
+    // Only if user didn't explicitly pick a date
+    // We'll keep full date for precision
+  }
+
+  if (editingId) {
+    const t = TASKS.find(x => x.id === editingId);
+    if (t) { Object.assign(t, { name, cat, who, pri, deadline }); }
+  } else {
+    TASKS.push({ id: 't' + Date.now(), name, cat, who, pri, deadline, done: false });
+  }
+  saveTasks();
+  closeModal();
+  render();
+}
+
+// Delete
+let deleteTargetId = null;
+function confirmDelete(id) {
+  deleteTargetId = id;
+  document.getElementById('confirmOverlay').classList.add('show');
+  document.getElementById('btnConfirmYes').onclick = () => {
+    TASKS = TASKS.filter(t => t.id !== deleteTargetId);
+    saveTasks();
+    closeConfirm();
+    render();
+  };
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('show');
+  deleteTargetId = null;
+}
+
+// Notes
+function initNotes() {
+  const el = document.getElementById('notes');
+  el.value = localStorage.getItem(NOTES_KEY) || '';
+  el.addEventListener('input', () => localStorage.setItem(NOTES_KEY, el.value));
+}
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeConfirm(); }
+});
+
+// Init
+updateCountdown();
+setInterval(updateCountdown, 1000);
+render();
+initNotes();
+</script>
+</body>
+</html>
